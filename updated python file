@@ -1,0 +1,45 @@
+import pandas as pd
+import ollama
+
+# Load CSV
+df = pd.read_csv(
+    "/Users/ganesh/Downloads/comment.csv",
+    header=None,
+    names=["comment"]
+)
+
+# Combine all comments
+all_comments = "\n".join(df["comment"].tolist())
+
+# Prompt
+prompt = f"""
+Generate a short summary report from these comments.
+
+Requirements:
+- Use bullet points
+- Keep it concise
+- Avoid repetition
+- Add a short overall summary
+
+Comments:
+{all_comments}
+"""
+
+# Local model response
+response = ollama.chat(
+    model='llama3',
+    messages=[
+        {
+            'role': 'user',
+            'content': prompt
+        }
+    ]
+)
+
+final_report = response['message']['content']
+
+# Save report
+with open("final_report.txt", "w") as f:
+    f.write(final_report)
+
+print(final_report)
